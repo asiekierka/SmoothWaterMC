@@ -47,6 +47,11 @@ public abstract class BlockLiquidForged extends BlockLiquid {
 	}
 
 	@Override
+	public boolean isTranslucent(IBlockState state) {
+		return SmoothWaterMod.isActive;
+	}
+
+	@Override
 	public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
 		if (getRenderType(blockState) == EnumBlockRenderType.MODEL) {
 			IBlockState neighbor = blockAccess.getBlockState(pos.offset(side));
