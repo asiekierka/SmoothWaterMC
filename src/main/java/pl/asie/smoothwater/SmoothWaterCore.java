@@ -28,6 +28,9 @@ import java.util.Map;
 @IFMLLoadingPlugin.SortingIndex(1001)
 @IFMLLoadingPlugin.TransformerExclusions({"pl.asie.smoothwater"})
 public class SmoothWaterCore implements IFMLLoadingPlugin {
+	public static Configuration config;
+	public static boolean patchModdedFluids;
+
 	@Override
 	public String[] getASMTransformerClass() {
 		return new String[]{"pl.asie.smoothwater.SmoothWaterTransformer"};
@@ -46,6 +49,14 @@ public class SmoothWaterCore implements IFMLLoadingPlugin {
 
 	@Override
 	public void injectData(Map<String, Object> data) {
+		config = new Configuration(new File(new File("config"), "smoothwater.cfg"));
+
+		patchModdedFluids = config.getBoolean("patchModdedFluidAO", "general", true, "Patches default ambient occlusion handling in modded fluids.");
+
+		if (config.hasChanged()) {
+			config.save();
+		}
+
 	}
 
 	@Override

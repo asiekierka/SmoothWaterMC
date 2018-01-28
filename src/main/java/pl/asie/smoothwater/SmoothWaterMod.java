@@ -59,6 +59,10 @@ public class SmoothWaterMod {
 
 	@Mod.EventHandler
 	public void onPreInit(FMLPreInitializationEvent event) {
+		if (SmoothWaterCore.config == null) {
+			throw new RuntimeException("SmoothWater: Coremod not present!");
+		}
+
 		MinecraftForge.EVENT_BUS.register(this);
 		proxy.preInit();
 	}

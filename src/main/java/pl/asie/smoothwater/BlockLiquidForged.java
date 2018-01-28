@@ -48,7 +48,7 @@ public abstract class BlockLiquidForged extends BlockLiquid {
 
 	@Override
 	public boolean isTranslucent(IBlockState state) {
-		return SmoothWaterMod.isActive;
+		return SmoothWaterMod.isActive || super.isTranslucent(state);
 	}
 
 	@Override

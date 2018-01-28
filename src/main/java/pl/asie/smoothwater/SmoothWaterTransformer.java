@@ -23,7 +23,7 @@ import com.google.common.collect.Multimap;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 import org.objectweb.asm.*;
-import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +31,36 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SmoothWaterTransformer implements IClassTransformer {
+	public static void appendIsTranslucentPatch(ClassNode cn, String methodName, String transformedName) {
+		MethodNode methodNode = new MethodNode(Opcodes.ACC_PUBLIC, methodName, "(Lnet/minecraft/block/state/IBlockState;)Z", null, null);
+		LabelNode l0 = new LabelNode(new Label());
+		methodNode.instructions.add(l0);
+		methodNode.instructions.add(new FieldInsnNode(Opcodes.GETSTATIC, "pl/asie/smoothwater/SmoothWaterMod", "isActive", "Z"));
+		LabelNode l1 = new LabelNode(new Label());
+		methodNode.instructions.add(new JumpInsnNode(Opcodes.IFNE, l1));
+		methodNode.instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
+		methodNode.instructions.add(new VarInsnNode(Opcodes.ALOAD, 1));
+		methodNode.instructions.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "net/minecraft/block/Block", methodName, "(Lnet/minecraft/block/state/IBlockState;)Z", false));
+		LabelNode l2 = new LabelNode(new Label());
+		methodNode.instructions.add(new JumpInsnNode(Opcodes.IFEQ, l2));
+		methodNode.instructions.add(l1);
+		methodNode.instructions.add(new FrameNode(Opcodes.F_SAME, 0, null, 0, null));
+		methodNode.instructions.add(new InsnNode(Opcodes.ICONST_1));
+		LabelNode l3 = new LabelNode(new Label());
+		methodNode.instructions.add(new JumpInsnNode(Opcodes.GOTO, l3));
+		methodNode.instructions.add(l2);
+		methodNode.instructions.add(new FrameNode(Opcodes.F_SAME, 0, null, 0, null));
+		methodNode.instructions.add(new InsnNode(Opcodes.ICONST_0));
+		methodNode.instructions.add(l3);
+		methodNode.instructions.add(new FrameNode(Opcodes.F_SAME1, 0, null, 1, new Object[]{Opcodes.INTEGER}));
+		methodNode.instructions.add(new InsnNode(Opcodes.IRETURN));
+		LabelNode l4 = new LabelNode(new Label());
+		methodNode.instructions.add(l4);
+		methodNode.maxLocals = 2;
+		methodNode.maxStack = 2;
+		cn.methods.add(methodNode);
+	}
+
 	public static class MV extends MethodVisitor {
 		public MV(int api, MethodVisitor parent) {
 			super(api, parent);
@@ -79,6 +109,26 @@ public class SmoothWaterTransformer implements IClassTransformer {
 			ClassVisitor visitor = new CV(Opcodes.ASM5, writer);
 
 			reader.accept(visitor, 0);
+			return writer.toByteArray();
+		} else if ("net/minecraftforge/fluids/BlockFluidBase".equals(reader.getClassName()) && SmoothWaterCore.patchModdedFluids) {
+			System.out.println("[SmoothWaterCore] Patched " + transformedName + "!");
+
+			ClassNode node = new ClassNode(Opcodes.ASM5);
+			reader.accept(node, 0);
+
+			boolean isObf = false;
+
+		    for (MethodNode methodNode : node.methods) {
+		    	if ("func_180661_e".equals(methodNode.name)) {
+		    		isObf = true;
+		    		break;
+			    }
+		    }
+
+			appendIsTranslucentPatch(node, isObf ? "func_149751_l" : "isTranslucent", transformedName);
+
+			ClassWriter writer = new ClassWriter(0);
+			node.accept(writer);
 			return writer.toByteArray();
 		} else {
 			return basicClass;
