@@ -1,0 +1,17 @@
+{
+    "modListVersion": 2,
+    "modList": [
+        {
+            "modid": "smoothwater",
+            "name": "SmoothWater",
+            "version": "${version}",
+            "mcversion": "${mcversion}",
+            "description": "Smooth water rendering for Minecraft.",
+            "authorList": [
+                "asiekierka"
+            ],
+            "url": "http://asie.pl",
+            "updateUrl": "http://asie.pl/files/minecraft/update/smoothwater.json"
+        }
+    ]
+}
