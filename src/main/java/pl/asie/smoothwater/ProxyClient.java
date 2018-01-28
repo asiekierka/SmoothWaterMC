@@ -43,6 +43,7 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -89,7 +90,7 @@ public class ProxyClient extends ProxyCommon {
 
 	@SubscribeEvent
 	public void onModelBake(ModelBakeEvent event) {
-		for (Block b : GameRegistry.findRegistry(Block.class)) {
+		for (Block b : ForgeRegistries.BLOCKS) {
 			if (b instanceof BlockLiquid) {
 				Block lookupBlock = b;
 				if (lookupBlock instanceof BlockDynamicLiquid) {
