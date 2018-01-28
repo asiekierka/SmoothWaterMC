@@ -63,12 +63,12 @@ public class SmoothWaterMod {
 		proxy.preInit();
 	}
 
-	@SubscribeEvent(priority = EventPriority.LOWEST)
-	public void onRegisterBlocks(RegistryEvent.Register<Block> event) {
+	@Mod.EventHandler
+	public void onInit(FMLInitializationEvent event) {
 		Field f = ReflectionHelper.findField(Block.class, "blockState", "field_176227_L");
 		Field f2 = ReflectionHelper.findField(Block.class, "defaultBlockState", "field_176228_M");
 
-		for (Block b : event.getRegistry()) {
+		for (Block b : Block.REGISTRY) {
 			if (b instanceof BlockLiquidForged) {
 				try {
 					f.set(b, new ExtendedBlockState(b, b.getBlockState().getProperties().toArray(new IProperty[0]), BlockFluidBase.FLUID_RENDER_PROPS.toArray(new IUnlistedProperty<?>[0])));

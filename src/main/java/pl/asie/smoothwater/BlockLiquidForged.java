@@ -110,7 +110,7 @@ public abstract class BlockLiquidForged extends BlockLiquid {
 			return -1000.0;
 		}
 		Vec3d vec = getFlow(world, pos, state);
-		return vec.x == 0.0D && vec.z == 0.0D ? -1000.0D : Math.atan2(vec.z, vec.x) - Math.PI / 2D;
+		return vec.xCoord == 0.0D && vec.zCoord == 0.0D ? -1000.0D : Math.atan2(vec.zCoord, vec.xCoord) - Math.PI / 2D;
 	}
 
 	@Override

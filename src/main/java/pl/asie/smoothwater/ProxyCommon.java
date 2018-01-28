@@ -19,7 +19,6 @@
 package pl.asie.smoothwater;
 
 import net.minecraft.block.Block;
-import net.minecraftforge.registries.IForgeRegistry;
 
 public class ProxyCommon {
 	public void preInit() {

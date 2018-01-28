@@ -45,7 +45,6 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import net.minecraftforge.registries.IForgeRegistry;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -57,20 +56,6 @@ public class ProxyClient extends ProxyCommon {
 	public void preInit() {
 		super.preInit();
 		MinecraftForge.EVENT_BUS.register(this);
-	}
-
-	@SubscribeEvent
-	public void onModelRegistry(ModelRegistryEvent event) {
-		for (Block b : GameRegistry.findRegistry(Block.class)) {
-			if (b instanceof BlockLiquidForged) {
-				ModelLoader.setCustomStateMapper(b, new StateMapperBase() {
-					@Override
-					protected ModelResourceLocation getModelResourceLocation(IBlockState state) {
-						return new ModelResourceLocation(state.getBlock().getRegistryName(), "fluid");
-					}
-				});
-			}
-		}
 	}
 
 	@SubscribeEvent
@@ -101,7 +86,9 @@ public class ProxyClient extends ProxyCommon {
 						DefaultVertexFormats.ITEM,
 						ModelLoader.defaultTextureGetter()
 				);
-				event.getModelRegistry().putObject(new ModelResourceLocation(b.getRegistryName(), "fluid"), baked);
+				for (int i = 0; i < 16; i++) {
+					event.getModelRegistry().putObject(new ModelResourceLocation(b.getRegistryName(), "level=" + i), baked);
+				}
 			}
 		}
 	}
