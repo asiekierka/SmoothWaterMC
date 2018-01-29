@@ -22,7 +22,7 @@ apply plugin: 'net.minecrell.licenser'
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-version = "0.1.2-1.10"
+version = "0.1.2-1.11"
 group = "pl.asie.smoothwater"
 archivesBaseName = "SmoothWater"
 
@@ -38,12 +38,12 @@ dependencies {
 }
 
 minecraft {
-	version = "1.10.2-12.18.3.2511"
+	version = "1.11.2-13.20.1.2588"
 
 	runDir = "run"
 	useDepAts = true
 	makeObfSourceJar = false
-	mappings = "snapshot_20161111"
+	mappings = "snapshot_20170519"
 
 	replace '@VERSION@', project.version
 	replace '@MC_VERSION@', version
