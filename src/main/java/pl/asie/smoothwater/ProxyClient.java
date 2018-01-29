@@ -39,6 +39,7 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.model.TRSRTransformation;
+import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -54,6 +55,14 @@ import java.util.*;
 public class ProxyClient extends ProxyCommon {
 	private static final Set<Block> patchwork = new HashSet<>();
 
+	private Fluid getFluid(Block b) {
+		Block lookupBlock = b;
+		if (lookupBlock instanceof BlockDynamicLiquid) {
+			lookupBlock = BlockDynamicLiquid.getStaticBlock(lookupBlock.getDefaultState().getMaterial());
+		}
+		return FluidRegistry.lookupFluidForBlock(lookupBlock);
+	}
+
 	@Override
 	public void preInit() {
 		super.preInit();
@@ -63,7 +72,7 @@ public class ProxyClient extends ProxyCommon {
 	@SubscribeEvent
 	public void onModelRegistry(ModelRegistryEvent event) {
 		for (Block b : GameRegistry.findRegistry(Block.class)) {
-			if (b instanceof BlockLiquidForged) {
+			if (b instanceof BlockLiquidForged && getFluid(b) != null) {
 				ModelLoader.setCustomStateMapper(b, new StateMapperBase() {
 					@Override
 					protected ModelResourceLocation getModelResourceLocation(IBlockState state) {
@@ -82,7 +91,7 @@ public class ProxyClient extends ProxyCommon {
 
 			Field f = ReflectionHelper.findField(BlockStateMapper.class, "setBuiltInBlocks", "field_178449_b");
 			Collection c = (Collection) f.get(((ModelManager) one).getBlockModelShapes().getBlockStateMapper());
-			c.removeIf(o -> o instanceof BlockLiquidForged);
+			c.removeIf(o -> o instanceof BlockLiquidForged && getFluid((Block) o) != null);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -92,17 +101,16 @@ public class ProxyClient extends ProxyCommon {
 	public void onModelBake(ModelBakeEvent event) {
 		for (Block b : ForgeRegistries.BLOCKS) {
 			if (b instanceof BlockLiquid) {
-				Block lookupBlock = b;
-				if (lookupBlock instanceof BlockDynamicLiquid) {
-					lookupBlock = BlockDynamicLiquid.getStaticBlock(lookupBlock.getDefaultState().getMaterial());
+				Fluid f = getFluid(b);
+				if (f != null) {
+					ModelFluid fluid = new ModelFluid(f);
+					IBakedModel baked = fluid.bake(
+							TRSRTransformation.identity(),
+							DefaultVertexFormats.ITEM,
+							ModelLoader.defaultTextureGetter()
+					);
+					event.getModelRegistry().putObject(new ModelResourceLocation(b.getRegistryName(), "fluid"), baked);
 				}
-				ModelFluid fluid = new ModelFluid(FluidRegistry.lookupFluidForBlock(lookupBlock));
-				IBakedModel baked = fluid.bake(
-						TRSRTransformation.identity(),
-						DefaultVertexFormats.ITEM,
-						ModelLoader.defaultTextureGetter()
-				);
-				event.getModelRegistry().putObject(new ModelResourceLocation(b.getRegistryName(), "fluid"), baked);
 			}
 		}
 	}
