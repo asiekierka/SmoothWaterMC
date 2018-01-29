@@ -39,6 +39,7 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.model.TRSRTransformation;
+import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -51,7 +52,13 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 public class ProxyClient extends ProxyCommon {
-	private static final Set<Block> patchwork = new HashSet<>();
+	private Fluid getFluid(Block b) {
+		Block lookupBlock = b;
+		if (lookupBlock instanceof BlockDynamicLiquid) {
+			lookupBlock = BlockDynamicLiquid.getStaticBlock(lookupBlock.getDefaultState().getMaterial());
+		}
+		return FluidRegistry.lookupFluidForBlock(lookupBlock);
+	}
 
 	@Override
 	public void preInit() {
@@ -67,7 +74,7 @@ public class ProxyClient extends ProxyCommon {
 
 			Field f = ReflectionHelper.findField(BlockStateMapper.class, "setBuiltInBlocks", "field_178449_b");
 			Collection c = (Collection) f.get(((ModelManager) one).getBlockModelShapes().getBlockStateMapper());
-			c.removeIf(o -> o instanceof BlockLiquidForged);
+			c.removeIf(o -> o instanceof BlockLiquidForged && getFluid((Block) o) != null);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -77,18 +84,17 @@ public class ProxyClient extends ProxyCommon {
 	public void onModelBake(ModelBakeEvent event) {
 		for (Block b : ForgeRegistries.BLOCKS) {
 			if (b instanceof BlockLiquid) {
-				Block lookupBlock = b;
-				if (lookupBlock instanceof BlockDynamicLiquid) {
-					lookupBlock = BlockDynamicLiquid.getStaticBlock(lookupBlock.getDefaultState().getMaterial());
-				}
-				ModelFluid fluid = new ModelFluid(FluidRegistry.lookupFluidForBlock(lookupBlock));
-				IBakedModel baked = fluid.bake(
-						TRSRTransformation.identity(),
-						DefaultVertexFormats.ITEM,
-						ModelLoader.defaultTextureGetter()
-				);
-				for (int i = 0; i < 16; i++) {
-					event.getModelRegistry().putObject(new ModelResourceLocation(b.getRegistryName(), "level=" + i), baked);
+				Fluid f = getFluid(b);
+				if (f != null) {
+					ModelFluid fluid = new ModelFluid(f);
+					IBakedModel baked = fluid.bake(
+							TRSRTransformation.identity(),
+							DefaultVertexFormats.ITEM,
+							ModelLoader.defaultTextureGetter()
+					);
+					for (int i = 0; i < 16; i++) {
+						event.getModelRegistry().putObject(new ModelResourceLocation(b.getRegistryName(), "level=" + i), baked);
+					}
 				}
 			}
 		}

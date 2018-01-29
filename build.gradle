@@ -22,7 +22,7 @@ apply plugin: 'net.minecrell.licenser'
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-version = "0.1.1-1.10"
+version = "0.1.2-1.10"
 group = "pl.asie.smoothwater"
 archivesBaseName = "SmoothWater"
 
