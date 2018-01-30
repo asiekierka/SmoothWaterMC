@@ -43,7 +43,11 @@ public abstract class BlockLiquidForged extends BlockLiquid {
 
 	@Override
 	public EnumBlockRenderType getRenderType(IBlockState state) {
-		return SmoothWaterMod.isActive ? EnumBlockRenderType.MODEL : EnumBlockRenderType.LIQUID;
+		return SmoothWaterMod.isActive ? EnumBlockRenderType.MODEL : super.getRenderType(state);
+	}
+
+	public EnumBlockRenderType getRenderTypeSuper(IBlockState state) {
+		return super.getRenderType(state);
 	}
 
 	@Override

@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDynamicLiquid;
 import net.minecraft.block.BlockLiquid;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.IBakedModel;
@@ -31,6 +32,7 @@ import net.minecraft.client.renderer.block.statemap.BlockStateMapper;
 import net.minecraft.client.renderer.block.statemap.IStateMapper;
 import net.minecraft.client.renderer.block.statemap.StateMapperBase;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -53,6 +55,14 @@ import java.util.*;
 
 public class ProxyClient extends ProxyCommon {
 	private Fluid getFluid(Block b) {
+		if (b instanceof BlockLiquidForged && ((BlockLiquidForged) b).getRenderTypeSuper(b.getDefaultState()) == EnumBlockRenderType.LIQUID) {
+			if (b.getMaterial(b.getDefaultState()) == Material.LAVA) {
+				return FluidRegistry.LAVA;
+			} else if (b.getMaterial(b.getDefaultState()) == Material.WATER) {
+				return FluidRegistry.WATER;
+			}
+		}
+
 		Block lookupBlock = b;
 		if (lookupBlock instanceof BlockDynamicLiquid) {
 			lookupBlock = BlockDynamicLiquid.getStaticBlock(lookupBlock.getDefaultState().getMaterial());
