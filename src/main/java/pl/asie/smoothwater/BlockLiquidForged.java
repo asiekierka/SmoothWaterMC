@@ -20,17 +20,13 @@ package pl.asie.smoothwater;
 
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
-import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fluids.BlockFluidBase;
 import net.minecraftforge.fluids.IFluidBlock;
 
@@ -52,7 +48,7 @@ public abstract class BlockLiquidForged extends BlockLiquid {
 
 	@Override
 	public boolean isTranslucent(IBlockState state) {
-		return SmoothWaterMod.isActive || super.isTranslucent(state);
+		return (SmoothWaterMod.isActive && SmoothWaterCore.patchFluidTranslucency) || super.isTranslucent(state);
 	}
 
 	@Override

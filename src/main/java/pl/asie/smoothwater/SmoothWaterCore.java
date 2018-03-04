@@ -18,7 +18,11 @@
 
 package pl.asie.smoothwater;
 
+import net.minecraftforge.common.ForgeVersion;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.common.versioning.DefaultArtifactVersion;
+import net.minecraftforge.fml.common.versioning.VersionParser;
+import net.minecraftforge.fml.common.versioning.VersionRange;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
 import javax.annotation.Nullable;
@@ -29,7 +33,7 @@ import java.util.Map;
 @IFMLLoadingPlugin.TransformerExclusions({"pl.asie.smoothwater"})
 public class SmoothWaterCore implements IFMLLoadingPlugin {
 	public static Configuration config;
-	public static boolean patchModdedFluids;
+	public static boolean patchModdedFluidTranslucency, patchFluidTranslucency;
 
 	@Override
 	public String[] getASMTransformerClass() {
@@ -51,7 +55,15 @@ public class SmoothWaterCore implements IFMLLoadingPlugin {
 	public void injectData(Map<String, Object> data) {
 		config = new Configuration(new File(new File("config"), "smoothwater.cfg"));
 
-		patchModdedFluids = config.getBoolean("patchModdedFluidAO", "general", true, "Patches default ambient occlusion handling in modded fluids.");
+		VersionRange range = VersionParser.parseRange("(,14.23.2.2623)");
+		DefaultArtifactVersion requiredVersion = new DefaultArtifactVersion("Forge", range);
+
+		patchFluidTranslucency = requiredVersion.containsVersion(new DefaultArtifactVersion("Forge", ForgeVersion.getVersion()));
+		if (patchFluidTranslucency) {
+			patchModdedFluidTranslucency = config.getBoolean("patchModdedFluidAO", "general", true, "Patches default ambient occlusion handling in modded fluids.");
+		} else {
+			patchModdedFluidTranslucency = false;
+		}
 
 		if (config.hasChanged()) {
 			config.save();

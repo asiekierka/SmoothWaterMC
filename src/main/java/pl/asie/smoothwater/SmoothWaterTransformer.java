@@ -18,17 +18,9 @@
 
 package pl.asie.smoothwater;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import net.minecraft.launchwrapper.IClassTransformer;
-import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 import org.objectweb.asm.*;
 import org.objectweb.asm.tree.*;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 public class SmoothWaterTransformer implements IClassTransformer {
 	public static void appendIsTranslucentPatch(ClassNode cn, String methodName, String transformedName) {
@@ -110,7 +102,7 @@ public class SmoothWaterTransformer implements IClassTransformer {
 
 			reader.accept(visitor, 0);
 			return writer.toByteArray();
-		} else if ("net/minecraftforge/fluids/BlockFluidBase".equals(reader.getClassName()) && SmoothWaterCore.patchModdedFluids) {
+		} else if ("net/minecraftforge/fluids/BlockFluidBase".equals(reader.getClassName()) && SmoothWaterCore.patchModdedFluidTranslucency) {
 			System.out.println("[SmoothWaterCore] Patched " + transformedName + "!");
 
 			ClassNode node = new ClassNode(Opcodes.ASM5);
